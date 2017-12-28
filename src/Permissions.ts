@@ -98,11 +98,11 @@ class Permissions {
         if (typeof permission === 'number' && permission >= 0) 
             return permission;
 
-        if (permission instanceof Permissions) 
-            return permission.bitfield;
+        if (<any> permission instanceof Permissions) 
+            return  (<any> permission).bitfield;
 
-        if (permission instanceof Array) 
-            return permission.map(p => this.resolve(p)).reduce((prev, p) => prev | p, 0);
+        if (<any> permission instanceof Array) 
+            return (<any> permission).map((p: Permission) => this.resolve(p)).reduce((prev: Permission, p: Permission) => prev | p, 0);
 
         if (typeof permission === 'string') 
             return <any> Permission[(<any> permission)];

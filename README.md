@@ -1,3 +1,8 @@
+# LWD
+Simple Promise-based Discord login API<br>
+[Generated Documentation](https://lwd.js.org/docs)<br>
+[Live Example](https://lwd.js.org/)
+
 ## Using
 (HTML)
 ```html
@@ -20,6 +25,9 @@ discord.onlogin = async () => {
     let guilds = await discord.fetchGuilds().catch(console.log);
     // Add the user to a guild (requires scope `GuildsJoin`)
     await discord.joinGuild('5h293Fy');
+
+    // The login state
+    discord.state;
 }
 
 // Fires when there is no auth token
@@ -29,6 +37,16 @@ discord.onlogout = async () => {
 
 window.onload = async () => {
     await discord.init(); // Loads auth token, only once the window has loaded
+}
+
+// Authorize
+async function login() {
+    await discord.login('393448325438898187', Scope.Identify, Scope.Connections, Scope.Email, Scope.Guilds);
+}
+
+// Unauthorize
+async function logout() {
+    await discord.logout();
 }
 ```
 
