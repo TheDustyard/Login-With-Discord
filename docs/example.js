@@ -46,6 +46,8 @@ discord.onlogout = async () => {
     Array.from(document.getElementsByClassName('out')).forEach(x => {
         x.style.display = '';
     });
+    document.getElementById('connections').innerHTML = '';
+    document.getElementById('guilds').innerHTML = '';
 }
 
 window.onload = () => {
