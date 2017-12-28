@@ -5,14 +5,17 @@
         <script src="lwd.js"></script>
         <script src="example.js"></script>
         <style>
-            html, body {
+            html,
+            body {
                 width: 100%;
                 height: 100%;
                 margin: 0;
                 font-family: Whitney, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
                 background: #2C2F33;
                 color: #FFF !important;
+                overflow: hidden;
             }
+
             #loady {
                 position: absolute;
                 top: 0;
@@ -24,12 +27,14 @@
                 z-index: 10000000;
                 color: #FFF !important;
             }
+
             #loady div {
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
             }
+
             #login {
                 background-color: #7289DA;
                 border: none;
@@ -56,26 +61,172 @@
                 font-weight: bold;
                 text-transform: uppercase;
                 color: #FFF !important;
+                vertical-align: middle;
+            }
+
+            .udata {
+                line-height: 128px;
+                height: 128px;
+                margin: 20px 20px 20px 20px;
             }
 
             #userpfp {
                 position: relative;
                 border-radius: 1000px;
-                margin: 20px 20px 20px 20px
+                height: 128px;
+            }
+
+            .uinfo {
+                margin-left: 20px;
+                display: inline-block;
+                line-height: 20px;
+            }
+
+            #usertag {
+                display: block;
+            }
+
+            #usertag .username {
+                font-size: 30px;
+            }
+
+            #usertag .desc {
+                font-size: 15px;
+                opacity: .4;
+            }
+            #usertag .desc::before {
+                content: "#";
+            }
+
+            .extra {
+                margin-top: -8px;
+            }
+
+            #userid {
+                font-size: 12px;
+                opacity: .4;
+            }
+
+            #useremail {
+                font-size: 12px;
+                opacity: .4;
+            }
+            #useremail::before {
+                content: "- ";
+            }
+
+            #usermfa {
+                display: inline-block;
+            }
+            #usermfa.enabled {
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 15px;
+                padding: 10px 20px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: #FFF !important;
+                background-color: #43b581;
+                vertical-align: middle;
+            }
+
+            #usermfa.disabled {
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 15px;
+                padding: 10px 20px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: #FFF !important;
+                display: inline-block;  
+                background-color: #f04747; 
+                vertical-align: middle;
+            }
+
+            #connections {
+                display: inline-block;
+                overflow: auto;
+                height: calc(100% - 168px);
+                width: 585px;
+                position: absolute;
+                left: 0;
+            }
+
+            #connections .connection {
+                padding: 10px;
+                display: inline-block;
+                width: auto;
+                margin: auto;
+                width: 240px;
+                margin: 10px;
+                border: 1px solid #202225;
+                border-radius: 3px;
+            }
+            #connections .connection .type{
+                text-transform: uppercase;
+                display: block;
+            }
+            #connections .connection .type::after{
+                content: ":"
+            }
+            #connections .connection svg{
+                vertical-align: middle;
+            }
+
+            #guilds {
+                display: inline-block;
+                overflow: auto;
+                height: 100%;
+                width: calc(100% - 571px);
+                position: absolute;
+                top: 0px;
+                right: 0px;
+            }
+
+            #guilds .guild {
+                margin: 10px 10px;
+                display: inline-block;
+            }
+
+            #guilds img {
+                height: 80px;
+                border-radius: 100px;
+                display: block;
+            }
+
+            #guilds .hover {
+                display: none;
             }
         </style>
     </head>
+
     <body>
         <button onclick="login()" id="login" class="out">login</button>
 
-        <div id="loady" class="in"><div>LOADING...</div></div>
-        <img id="userpfp" class="in">
-        <div id="userid" class="in"></div>
-        <div id="usertag" class="in"></div>
-        <div id="useremail" class="in"></div>
-        <div id="usermfa" class="in"></div>
-        <button onclick="logout()" id="logout" class="in">logout</button>
-        <div id="connections" class="in"></div>
+        <div id="loady" class="in">
+            <div>LOADING...</div>
+        </div>
+        <div class="l">
+            <div class="udata">
+                <img id="userpfp" class="in">
+                <div class="uinfo">
+                    <div id="usertag" class="in"></div>
+                    <div class="extra">
+                        <span id="userid" class="in"></span>
+                        <span id="useremail" class="in"></span>
+                    </div>
+                    <div id="usermfa" class="in"></div>
+                    <button onclick="logout()" id="logout" class="in">logout</button>
+                </div>
+            </div>
+            <div id="connections" class="in"></div>
+        </div>
         <div id="guilds" class="in"></div>
+        <div id="guildinspector" class="in">
+            <img>
+            <div id="name"></div>
+        </div>
     </body>
 </html>
