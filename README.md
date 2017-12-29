@@ -1,7 +1,8 @@
 # LWD
 Simple Promise-based Discord login API<br>
 [Generated Documentation](https://lwd.js.org/docs)<br>
-[Live Example](https://lwd.js.org/)
+[Live Example](https://lwd.js.org/)<br>
+[Download](https://github.com/DusterTheFirst/Login-With-Discord/releases)
 
 ## Using
 (HTML)
