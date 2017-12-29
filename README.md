@@ -6,11 +6,11 @@ Simple Promise-based Discord login API<br>
 ## Using
 (HTML)
 ```html
-<script src="https://lwd.js.org/lwd.js"></script>
+<script src="./lwd.js"></script>
 ```
 (JS)
 ```js
-/// <reference path="https://lwd.js.org/lwd.d.ts" />
+/// <reference path="./lwd.d.ts" />
 let discord = new LoginWithDiscord({
     cache: true; //Default TRUE (Reccomended to cache the token)
 });

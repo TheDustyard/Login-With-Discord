@@ -112,6 +112,7 @@ interface User {
     username: string;
     email: string;
     avatarURL: string;
+    avatarGIFURL: string;
     tag: string;
     mention: string;
 }

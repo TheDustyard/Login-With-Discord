@@ -113,7 +113,8 @@ class LoginWithDiscord {
             }).then((user) => {
                 resolve({
                     avatar: user.avatar,
-                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`,
+                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
+                    avatarGIFURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.gif`,
                     discriminator: user.discriminator,
                     email: user.email,
                     id: user.id,
