@@ -30,18 +30,17 @@ class LoginWithDiscord {
         this.options.cache = options.cache || true;
 
         this.auth = this.getAuth();
-        // if (Object.keys(Util.parseHash(window)).includes('access_token')) {
-        //     let parsed = Util.parseHash(window);
-        //     this.setAuth({
-        //         access_token: parsed.access_token,
-        //         expires_in: parseInt(parsed.expires_in),
-        //         scopes: parsed.scope.split('+') as Scope[],
-        //         state: parsed.state,
-        //         token_type: parsed.token_type as "Bearer",
-        //         atime: Date.now()
-        //     });
-        //     window.location.hash = "";
-        // }
+        if (Object.keys(Util.parseHash(window)).includes('access_token')) {
+            let parsed = Util.parseHash(window);
+            this.setAuth({
+                access_token: parsed.access_token,
+                expires_in: parseInt(parsed.expires_in),
+                scopes: parsed.scope.split('+') as Scope[],
+                state: parsed.state,
+                token_type: parsed.token_type as "Bearer",
+                atime: Date.now()
+            });
+        }
     }
 
     public async init() {
@@ -129,7 +128,7 @@ class LoginWithDiscord {
             }).then((user) => {
                 resolve({
                     avatar: user.avatar,
-                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
+                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`,
                     discriminator: user.discriminator,
                     email: user.email,
                     id: user.id,
