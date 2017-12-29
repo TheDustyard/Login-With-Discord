@@ -9,18 +9,18 @@ class LoginWithDiscord {
         //  SET DEFAULTS
         this.options.cache = options.cache || true;
         this.auth = this.getAuth();
-        if (Object.keys(Util.parseHash(window)).includes('access_token')) {
-            let parsed = Util.parseHash(window);
-            this.setAuth({
-                access_token: parsed.access_token,
-                expires_in: parseInt(parsed.expires_in),
-                scopes: parsed.scope.split('+'),
-                state: parsed.state,
-                token_type: parsed.token_type,
-                atime: Date.now()
-            });
-            window.location.hash = "";
-        }
+        // if (Object.keys(Util.parseHash(window)).includes('access_token')) {
+        //     let parsed = Util.parseHash(window);
+        //     this.setAuth({
+        //         access_token: parsed.access_token,
+        //         expires_in: parseInt(parsed.expires_in),
+        //         scopes: parsed.scope.split('+') as Scope[],
+        //         state: parsed.state,
+        //         token_type: parsed.token_type as "Bearer",
+        //         atime: Date.now()
+        //     });
+        //     window.location.hash = "";
+        // }
     }
     set onlogin(_) {
         if (_ instanceof Function)
