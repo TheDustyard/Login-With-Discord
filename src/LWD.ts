@@ -30,7 +30,7 @@ class LoginWithDiscord {
         this.options.cache = options.cache || true;
 
         this.auth = this.getAuth();
-        if (Util.parseHash(window)) {
+        if (Object.keys(Util.parseHash(window)).includes('access_token')) {
             let parsed = Util.parseHash(window);
             this.setAuth({
                 access_token: parsed.access_token,
