@@ -41,7 +41,7 @@ window.onload = async () => {
 
 // Authorize
 async function login() {
-    await discord.login('393448325438898187', Scope.Identify, Scope.Connections, Scope.Email, Scope.Guilds);
+    await discord.login(/*ClientID*/, Scope.Identify, Scope.Connections, Scope.Email, Scope.Guilds);
 }
 
 // Unauthorize
