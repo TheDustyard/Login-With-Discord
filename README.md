@@ -55,6 +55,7 @@ Asynchronus function that will get the user's [connections](https://discordapp.c
 Asynchronus function that will get the user's [guilds](https://discordapp.com/developers/docs/resources/user#get-current-user-guilds)
 
 ## `await discord.joinGuild('guildid')`
+**(requires scope `GuildsJoin`)**<br/>
 Asynchronus function that will join a guild
 
 ## `discord.state`
