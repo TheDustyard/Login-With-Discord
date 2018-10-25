@@ -72,7 +72,7 @@ class Permissions {
     /**
      * Bitfield of the packed permissions
      */
-    bitfield: number;
+    public bitfield: number;
 
     constructor(permissions: number) {
         this.bitfield = permissions;
@@ -83,10 +83,14 @@ class Permissions {
      * @param permission Permission(s) to check for
      * @param checkAdmin Whether to allow the administrator permission to override
      */
-    has(permission: PermissionResolvable | PermissionResolvable[], checkAdmin = true): boolean {
-        if (permission instanceof Array) return permission.every(p => this.has(p, checkAdmin));
+    public has(permission: PermissionResolvable | PermissionResolvable[], checkAdmin = true): boolean {
+        if (permission instanceof Array) {
+            return permission.every(p => this.has(p, checkAdmin));
+        }
         permission = Permissions.resolve(permission);
-        if (checkAdmin && (this.bitfield & Permission.ADMINISTRATOR) > 0) return true;
+        if (checkAdmin && (this.bitfield & Permission.ADMINISTRATOR) > 0) {
+            return true;
+        }
         return (this.bitfield & permission) === permission;
     }
 
@@ -94,25 +98,32 @@ class Permissions {
      * Resolves permissions to their numeric form.
      * @param  permission - Permission(s) to resolve
      */
-    static resolve(permission: PermissionResolvable): number {
-        if (typeof permission === 'number' && permission >= 0) 
+    public static resolve(permission: unknown | PermissionResolvable): number {
+        if (typeof permission === "number" && permission >= 0)  {
             return permission;
+        }
 
-        if (<any> permission instanceof Permissions) 
-            return  (<any> permission).bitfield;
+        if (permission instanceof Permissions)  {
+            return (permission as Permissions).bitfield;
+        }
 
-        if (<any> permission instanceof Array) 
-            return (<any> permission).map((p: Permission) => this.resolve(p)).reduce((prev: Permission, p: Permission) => prev | p, 0);
+        if (permission instanceof Array)  {
+            return (permission).map((p: Permission) => this.resolve(p)).reduce((prev: Permission, p: Permission) => prev | p, 0);
+        }
 
-        if (typeof permission === 'string') 
-            return <any> Permission[(<any> permission)];
+        if (typeof permission === "string")  {
+            return ((Permission as unknown) as INameToValueMap<number>)[permission];
+        }
 
-        throw new RangeError('PERMISSIONS_INVALID');
+        throw new RangeError("PERMISSIONS_INVALID");
     }
 
     /**
      * Bitfield representing the default permissions for users
-     * @type {number}
      */
-    static DEFAULT = 104324097;
+    public static DEFAULT = 104324097;
+}
+
+interface INameToValueMap<T> {
+    [key: string]: T;
 }

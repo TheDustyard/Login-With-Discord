@@ -1,9 +1,15 @@
-interface LWDOptions {
+interface IOptions {
     /** Should the user's auth information be cached? (default: true) */
     cache?: boolean;
+    /** The ID of the client */
+    clientID: string;
+    /** The scopes for the client */
+    scopes: Scope[];
+    /** The redirect url for the client */
+    redirect_url?: string;
 }
 
-interface User {
+interface IUser {
     avatar: string;
     discriminator: string;
     id: string;
@@ -16,26 +22,34 @@ interface User {
     mention: string;
 }
 
-interface Connection {
+interface IConnection {
     friend_sync: boolean;
     id: string;
     name: string;
     show_activity: boolean;
-    type: string; //ENUM?
+    type: string; // ENUM?
     verified: boolean;
     visibility: number;
 }
 
-interface Guild {
+interface IRawGuild {
     icon: string;
-    iconURL: string;
+    id: string;
+    name: string;
+    owner: boolean;
+    permissions: number;
+}
+
+interface IGuild {
+    icon?: string;
+    iconURL?: string;
     id: string;
     name: string;
     owner: boolean;
     permissions: Permissions;
 }
 
-interface Auth {
+interface IAuth {
     /** User's access token */
     access_token: string;
     /** Interval the token is valid for */
@@ -61,19 +75,6 @@ enum Scope {
     Guilds = "guilds",
     /** Allows your app to add users to a guild */
     GuildsJoin = "guilds.join",
-
-    //#region OUT OF SCOPE
-    // /** Allows your app to add users to a group dm */
-    // GdmJoin = "gdm.join",
-    // /** For local rpc server api access, this allows you to read messages from all client channels (otherwise restricted to channels/guilds your app creates) */
-    // MessagesRead = "messages.read",
-    // /** For local rpc server access, this allows you to control a user's local Discord client */
-    // RPC = "rpc",
-    // /** For local rpc server api access, this allows you to access the API as the local user */
-    // RPCAPI = "rpc.api",
-    // /** For local rpc server api access, this allows you to receive notifications pushed out to the user */
-    // RPCNotificationsRead = "rpc.notifications.read" 
-    //#endregion
 }
 
 enum State {

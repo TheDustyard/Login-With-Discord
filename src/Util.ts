@@ -1,16 +1,16 @@
 namespace Util {
-    export type stringObject = {
-        [x: string]: string
-    };
+    export interface IStringObject {
+        [x: string]: string;
+    }
 
     /**
-     * parse GET params from url
+     * parse GET params from url hash
      */
-    export function parseHash(w: Window = window): stringObject {
-        var query = w.location.hash.substr(1);
-        var result: stringObject = {};
+    export function parseHash(w: Window = window): IStringObject {
+        let query = w.location.hash.substr(1);
+        let result: IStringObject = {};
         query.split("&").forEach((part) => {
-            var item = part.split("=");
+            let item = part.split("=");
             result[item[0]] = decodeURIComponent(item[1]);
         });
         return result;
@@ -18,15 +18,18 @@ namespace Util {
 
     export type Method = "GET" | "POST" | "PUT";
 
-    export function request(method: Method, url: string, headers: stringObject = {}): Promise<string> {
+    export function request(method: Method, url: string, headers: IStringObject = {}): Promise<string> {
         return new Promise((resolve, reject) => {
-            var xmlHttp = new XMLHttpRequest();
+            let xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = () => {
-                if (xmlHttp.readyState == 4)
-                    if (xmlHttp.status == 200)
+                if (xmlHttp.readyState === 4) {
+                    if (xmlHttp.status === 200) {
                         resolve(xmlHttp.responseText);
-                    else
+                    }
+                    else {
                         reject(`${xmlHttp.status}: ${xmlHttp.statusText}`);
+                    }
+                }
             };
             xmlHttp.open(method, url, true);
             for (let header in headers) {
@@ -36,7 +39,7 @@ namespace Util {
         });
     }
 
-    export function requestJSON<T>(method: Method, url: string, headers?: stringObject): Promise<T> {
+    export function requestJSON<T>(method: Method, url: string, headers?: IStringObject): Promise<T> {
         return new Promise((resolve, reject) => {
             request(method, url, headers).then((data) => {
                 resolve(JSON.parse(data));

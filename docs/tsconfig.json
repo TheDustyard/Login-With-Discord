@@ -1,0 +1,13 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "declaration": false,
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "target": "es2017",
+        "watch": true,
+        "noImplicitAny": true,
+        "pretty": true,
+        "noImplicitReturns": true
+    }
+}

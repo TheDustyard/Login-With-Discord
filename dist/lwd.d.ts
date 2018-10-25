@@ -1,27 +1,27 @@
 declare class LoginWithDiscord {
     /** Options */
-    options: LWDOptions;
+    private options;
     /** Authorisation */
-    auth: Auth;
+    private auth;
     /** Login state */
-    state: State;
+    private state;
     private _onlogin;
     private _onlogout;
     onlogin: Function;
     onlogout: Function;
     /** Create a loginer */
-    constructor(options: LWDOptions);
-    init(): Promise<void>;
+    constructor(options: IOptions);
+    private init;
     /** Login to the Discord API */
-    login(clientID: string, ...scopes: Scope[]): Promise<void>;
-    logout(): Promise<void>;
-    fetchUser(): Promise<User>;
-    fetchConnections(): Promise<Connection[]>;
-    fetchGuilds(): Promise<Guild[]>;
+    login(): Promise<void>;
+    logout(): void;
+    fetchUser(): Promise<IUser>;
+    fetchConnections(): Promise<IConnection[]>;
+    fetchGuilds(): Promise<IGuild[]>;
     joinGuild(inviteID: string): Promise<void>;
-    private setAuth(auth);
-    private clearAuth();
-    private getAuth();
+    private setAuth;
+    private clearAuth;
+    private getAuth;
 }
 /** Numeric permission flags. */
 declare enum Permission {
@@ -68,7 +68,7 @@ declare enum Permission {
     MANAGE_NICKNAMES = 134217728,
     MANAGE_ROLES = 268435456,
     MANAGE_WEBHOOKS = 536870912,
-    MANAGE_EMOJIS = 1073741824,
+    MANAGE_EMOJIS = 1073741824
 }
 /**
  * Data that can be resolved to give a permission number. This can be:
@@ -93,18 +93,38 @@ declare class Permissions {
      * Resolves permissions to their numeric form.
      * @param  permission - Permission(s) to resolve
      */
-    static resolve(permission: PermissionResolvable): number;
+    static resolve(permission: unknown | PermissionResolvable): number;
     /**
      * Bitfield representing the default permissions for users
-     * @type {number}
      */
     static DEFAULT: number;
 }
-interface LWDOptions {
+interface INameToValueMap<T> {
+    [key: string]: T;
+}
+declare namespace Util {
+    interface IStringObject {
+        [x: string]: string;
+    }
+    /**
+     * parse GET params from url hash
+     */
+    function parseHash(w?: Window): IStringObject;
+    type Method = "GET" | "POST" | "PUT";
+    function request(method: Method, url: string, headers?: IStringObject): Promise<string>;
+    function requestJSON<T>(method: Method, url: string, headers?: IStringObject): Promise<T>;
+}
+interface IOptions {
     /** Should the user's auth information be cached? (default: true) */
     cache?: boolean;
+    /** The ID of the client */
+    clientID: string;
+    /** The scopes for the client */
+    scopes: Scope[];
+    /** The redirect url for the client */
+    redirect_url?: string;
 }
-interface User {
+interface IUser {
     avatar: string;
     discriminator: string;
     id: string;
@@ -116,7 +136,7 @@ interface User {
     tag: string;
     mention: string;
 }
-interface Connection {
+interface IConnection {
     friend_sync: boolean;
     id: string;
     name: string;
@@ -125,15 +145,22 @@ interface Connection {
     verified: boolean;
     visibility: number;
 }
-interface Guild {
+interface IRawGuild {
     icon: string;
-    iconURL: string;
+    id: string;
+    name: string;
+    owner: boolean;
+    permissions: number;
+}
+interface IGuild {
+    icon?: string;
+    iconURL?: string;
     id: string;
     name: string;
     owner: boolean;
     permissions: Permissions;
 }
-interface Auth {
+interface IAuth {
     /** User's access token */
     access_token: string;
     /** Interval the token is valid for */
@@ -157,7 +184,7 @@ declare enum Scope {
     /** Allows you to fetch the user's guilds */
     Guilds = "guilds",
     /** Allows your app to add users to a guild */
-    GuildsJoin = "guilds.join",
+    GuildsJoin = "guilds.join"
 }
 declare enum State {
     /** No auth token stored */
@@ -165,17 +192,5 @@ declare enum State {
     /** Auth token is stored */
     LoggedIn = 1,
     /** Authorising */
-    LoggingIn = 2,
-}
-declare namespace Util {
-    type stringObject = {
-        [x: string]: string;
-    };
-    /**
-     * parse GET params from url
-     */
-    function parseHash(w?: Window): stringObject;
-    type Method = "GET" | "POST" | "PUT";
-    function request(method: Method, url: string, headers?: stringObject): Promise<string>;
-    function requestJSON<T>(method: Method, url: string, headers?: stringObject): Promise<T>;
+    LoggingIn = 2
 }

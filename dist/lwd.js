@@ -3,68 +3,82 @@ class LoginWithDiscord {
     constructor(options) {
         /** Login state */
         this.state = State.LoggedOut;
+        // tslint:disable-next-line:no-empty
         this._onlogin = () => { };
+        // tslint:disable-next-line:no-empty
         this._onlogout = () => { };
         this.options = options;
         //  SET DEFAULTS
         this.options.cache = options.cache || true;
+        this.options.redirect_url = options.redirect_url || window.location.href;
+        for (let scope of options.scopes) {
+            if (!Object.values(Scope).includes(scope)) {
+                throw new TypeError(`'${scope}' is not a supported scope`);
+            }
+        }
         this.auth = this.getAuth();
-        if (Object.keys(Util.parseHash(window)).includes('access_token')) {
+        if (Object.keys(Util.parseHash(window)).includes("access_token")) {
             let parsed = Util.parseHash(window);
             this.setAuth({
                 access_token: parsed.access_token,
-                expires_in: parseInt(parsed.expires_in),
-                scopes: parsed.scope.split('+'),
+                expires_in: parseInt(parsed.expires_in, 10),
+                scopes: parsed.scope.split("+"),
                 state: parsed.state,
                 token_type: parsed.token_type,
                 atime: Date.now()
             });
         }
+        window.addEventListener("load", () => this.init());
     }
     set onlogin(_) {
-        if (_ instanceof Function)
+        if (_ instanceof Function) {
             this._onlogin = _;
-        else
-            throw "Event handlers must be callable";
-    }
-    set onlogout(_) {
-        if (_ instanceof Function)
-            this._onlogout = _;
-        else
-            throw "Event handlers must be callable";
-    }
-    async init() {
-        if (this.auth && ((this.auth.expires_in * 10e3) + Date.now()) > this.auth.atime) {
-            this._onlogin();
         }
         else {
-            this._onlogout();
+            throw new Error("Event handlers must be callable");
+        }
+    }
+    set onlogout(_) {
+        if (_ instanceof Function) {
+            this._onlogout = _;
+        }
+        else {
+            throw new Error("Event handlers must be callable");
+        }
+    }
+    init() {
+        if (this.auth && (Date.now() < (this.auth.atime * 10e3) + this.auth.expires_in)) {
+            if (this._onlogin) {
+                this._onlogin();
+            }
+        }
+        else {
+            if (this._onlogout) {
+                this._onlogout();
+            }
             this.clearAuth();
         }
     }
     /** Login to the Discord API */
-    async login(clientID, ...scopes) {
+    async login() {
         return new Promise((resolve, reject) => {
             if (this.getAuth()) {
                 resolve();
-                this._onlogin();
+                if (this._onlogin) {
+                    this._onlogin();
+                }
                 return;
             }
             this.state = State.LoggingIn;
-            for (let scope of scopes) {
-                if (!Object.values(Scope).includes(scope)) {
-                    reject(`Type Error: '${scope}' is not a supported scope`);
-                    return;
-                }
-            }
-            let url = `https://discordapp.com/oauth2/authorize?response_type=token&client_id=${clientID}&scope=${scopes.join('+')}&redirect_uri=${window.location.origin}${window.location.pathname}`;
-            let popout = window.open(url, 'LWD-login', `width=400,height=600`);
+            let url = `https://discordapp.com/oauth2/authorize?response_type=token&client_id=${this.options.clientID}&scope=${this.options.scopes.join("+")}&redirect_uri=${this.options.redirect_url}`;
+            let popout = window.open(url, "LWD-login", "width=400,height=600");
             popout.focus();
             let waiter = setInterval(() => {
                 try {
+                    // tslint:disable-next-line:no-unused-expression
                     popout.location.hash;
                 }
-                catch (e) {
+                catch (_a) {
                     return;
                 }
                 if (popout.location.hash && location.origin === popout.location.origin) {
@@ -73,42 +87,46 @@ class LoginWithDiscord {
                     let parsed = Util.parseHash(popout);
                     this.setAuth({
                         access_token: parsed.access_token,
-                        expires_in: parseInt(parsed.expires_in),
-                        scopes: parsed.scope.split('+'),
+                        expires_in: parseInt(parsed.expires_in, 10),
+                        scopes: parsed.scope.split("+"),
                         state: parsed.state,
                         token_type: parsed.token_type,
                         atime: Date.now()
                     });
                     this.state = State.LoggedIn;
                     resolve();
-                    this._onlogin();
+                    if (this._onlogin) {
+                        this._onlogin();
+                    }
                     return;
                 }
                 if (popout.location.search && location.origin === popout.location.origin) {
                     clearInterval(waiter);
                     popout.close();
                     this.state = State.LoggedOut;
-                    reject('Access Denied: Could not log in user');
+                    reject("Access Denied: Could not log in user");
                     return;
                 }
             }, 100);
         });
     }
-    async logout() {
-        this._onlogout();
-        return new Promise(() => this.clearAuth());
+    logout() {
+        if (this._onlogout) {
+            this._onlogout();
+        }
+        this.clearAuth();
     }
     async fetchUser() {
         return new Promise((resolve, reject) => {
             if (!this.auth) {
-                reject('You must login first');
+                reject("You must login first");
                 return;
             }
             if (!(this.auth.scopes.includes(Scope.Identify) || this.auth.scopes.includes(Scope.Email))) {
                 reject(`You must have the scope 'Identify' or 'Email' to use 'fetchUser'`);
                 return;
             }
-            Util.requestJSON('GET', `https://discordapp.com/api/v6/users/@me`, {
+            Util.requestJSON("GET", `https://discordapp.com/api/v6/users/@me`, {
                 Authorization: `${this.auth.token_type} ${this.auth.access_token}`
             }).then((user) => {
                 resolve({
@@ -129,14 +147,14 @@ class LoginWithDiscord {
     async fetchConnections() {
         return new Promise((resolve, reject) => {
             if (!this.auth) {
-                reject('You must login first');
+                reject("You must login first");
                 return;
             }
             if (!(this.auth.scopes.includes(Scope.Connections))) {
                 reject(`You must have the scope 'Connections' to use 'fetchConnections'`);
                 return;
             }
-            Util.requestJSON('GET', `https://discordapp.com/api/v6/users/@me/connections`, {
+            Util.requestJSON("GET", `https://discordapp.com/api/v6/users/@me/connections`, {
                 Authorization: `${this.auth.token_type} ${this.auth.access_token}`
             }).then((connections) => {
                 resolve(connections);
@@ -146,20 +164,20 @@ class LoginWithDiscord {
     async fetchGuilds() {
         return new Promise((resolve, reject) => {
             if (!this.auth) {
-                reject('You must login first');
+                reject("You must login first");
                 return;
             }
             if (!(this.auth.scopes.includes(Scope.Guilds))) {
                 reject(`You must have the scope 'Guilds' to use 'fetchGuilds'`);
                 return;
             }
-            Util.requestJSON('GET', `https://discordapp.com/api/v6/users/@me/guilds`, {
+            Util.requestJSON("GET", `https://discordapp.com/api/v6/users/@me/guilds`, {
                 Authorization: `${this.auth.token_type} ${this.auth.access_token}`
             }).then((guilds) => {
                 resolve(guilds.map(x => {
                     return {
                         icon: x.icon,
-                        iconURL: `https://cdn.discordapp.com/icons/${x.id}/${x.icon}.png`,
+                        iconURL: x.icon ? `https://cdn.discordapp.com/icons/${x.id}/${x.icon}.png` : null,
                         id: x.id,
                         name: x.name,
                         owner: x.owner,
@@ -172,36 +190,38 @@ class LoginWithDiscord {
     async joinGuild(inviteID) {
         return new Promise((resolve, reject) => {
             if (!this.auth) {
-                reject('You must login first');
+                reject("You must login first");
                 return;
             }
             if (!(this.auth.scopes.includes(Scope.GuildsJoin))) {
                 reject(`You must have the scope 'GuildsJoin' to use 'joinGuild'`);
                 return;
             }
-            Util.requestJSON('POST', `https://discordapp.com/api/v6/invites/${inviteID}`, {
+            Util.requestJSON("POST", `https://discordapp.com/api/v6/invites/${inviteID}`, {
                 Authorization: `${this.auth.token_type} ${this.auth.access_token}`
-            }).then((data) => {
-                resolve();
-            }).catch(() => reject('Invalid invite'));
+            }).then(resolve).catch(() => reject("Invalid invite"));
         });
     }
     setAuth(auth) {
         this.auth = auth;
-        if (this.options.cache)
-            window.localStorage.setItem('LWD', JSON.stringify(auth));
+        if (this.options.cache) {
+            window.localStorage.setItem("LWD", JSON.stringify(auth));
+        }
     }
     clearAuth() {
         this.auth = null;
-        if (this.options.cache)
-            window.localStorage.removeItem('LWD');
+        if (this.options.cache) {
+            window.localStorage.removeItem("LWD");
+        }
     }
     getAuth() {
         if (this.options.cache) {
-            if (window.localStorage.getItem('LWD'))
-                return JSON.parse(window.localStorage.getItem('LWD'));
-            else
+            if (window.localStorage.getItem("LWD")) {
+                return JSON.parse(window.localStorage.getItem("LWD"));
+            }
+            else {
                 return null;
+            }
         }
         else {
             return this.auth;
@@ -276,11 +296,13 @@ class Permissions {
      * @param checkAdmin Whether to allow the administrator permission to override
      */
     has(permission, checkAdmin = true) {
-        if (permission instanceof Array)
+        if (permission instanceof Array) {
             return permission.every(p => this.has(p, checkAdmin));
+        }
         permission = Permissions.resolve(permission);
-        if (checkAdmin && (this.bitfield & Permission.ADMINISTRATOR) > 0)
+        if (checkAdmin && (this.bitfield & Permission.ADMINISTRATOR) > 0) {
             return true;
+        }
         return (this.bitfield & permission) === permission;
     }
     /**
@@ -288,66 +310,35 @@ class Permissions {
      * @param  permission - Permission(s) to resolve
      */
     static resolve(permission) {
-        if (typeof permission === 'number' && permission >= 0)
+        if (typeof permission === "number" && permission >= 0) {
             return permission;
-        if (permission instanceof Permissions)
+        }
+        if (permission instanceof Permissions) {
             return permission.bitfield;
-        if (permission instanceof Array)
-            return permission.map((p) => this.resolve(p)).reduce((prev, p) => prev | p, 0);
-        if (typeof permission === 'string')
+        }
+        if (permission instanceof Array) {
+            return (permission).map((p) => this.resolve(p)).reduce((prev, p) => prev | p, 0);
+        }
+        if (typeof permission === "string") {
             return Permission[permission];
-        throw new RangeError('PERMISSIONS_INVALID');
+        }
+        throw new RangeError("PERMISSIONS_INVALID");
     }
 }
 /**
  * Bitfield representing the default permissions for users
- * @type {number}
  */
 Permissions.DEFAULT = 104324097;
-var Scope;
-(function (Scope) {
-    /** Allows access to linked third-party accounts */
-    Scope["Connections"] = "connections";
-    /** Allows you to fetch the user ***with*** an email */
-    Scope["Email"] = "email";
-    /** Allows you to fetch the user ***without*** an email */
-    Scope["Identify"] = "identify";
-    /** Allows you to fetch the user's guilds */
-    Scope["Guilds"] = "guilds";
-    /** Allows your app to add users to a guild */
-    Scope["GuildsJoin"] = "guilds.join";
-    //#region OUT OF SCOPE
-    // /** Allows your app to add users to a group dm */
-    // GdmJoin = "gdm.join",
-    // /** For local rpc server api access, this allows you to read messages from all client channels (otherwise restricted to channels/guilds your app creates) */
-    // MessagesRead = "messages.read",
-    // /** For local rpc server access, this allows you to control a user's local Discord client */
-    // RPC = "rpc",
-    // /** For local rpc server api access, this allows you to access the API as the local user */
-    // RPCAPI = "rpc.api",
-    // /** For local rpc server api access, this allows you to receive notifications pushed out to the user */
-    // RPCNotificationsRead = "rpc.notifications.read" 
-    //#endregion
-})(Scope || (Scope = {}));
-var State;
-(function (State) {
-    /** No auth token stored */
-    State[State["LoggedOut"] = 0] = "LoggedOut";
-    /** Auth token is stored */
-    State[State["LoggedIn"] = 1] = "LoggedIn";
-    /** Authorising */
-    State[State["LoggingIn"] = 2] = "LoggingIn";
-})(State || (State = {}));
 var Util;
 (function (Util) {
     /**
-     * parse GET params from url
+     * parse GET params from url hash
      */
     function parseHash(w = window) {
-        var query = w.location.hash.substr(1);
-        var result = {};
+        let query = w.location.hash.substr(1);
+        let result = {};
         query.split("&").forEach((part) => {
-            var item = part.split("=");
+            let item = part.split("=");
             result[item[0]] = decodeURIComponent(item[1]);
         });
         return result;
@@ -355,13 +346,16 @@ var Util;
     Util.parseHash = parseHash;
     function request(method, url, headers = {}) {
         return new Promise((resolve, reject) => {
-            var xmlHttp = new XMLHttpRequest();
+            let xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = () => {
-                if (xmlHttp.readyState == 4)
-                    if (xmlHttp.status == 200)
+                if (xmlHttp.readyState === 4) {
+                    if (xmlHttp.status === 200) {
                         resolve(xmlHttp.responseText);
-                    else
+                    }
+                    else {
                         reject(`${xmlHttp.status}: ${xmlHttp.statusText}`);
+                    }
+                }
             };
             xmlHttp.open(method, url, true);
             for (let header in headers) {
@@ -380,3 +374,26 @@ var Util;
     }
     Util.requestJSON = requestJSON;
 })(Util || (Util = {}));
+var Scope;
+(function (Scope) {
+    /** Allows access to linked third-party accounts */
+    Scope["Connections"] = "connections";
+    /** Allows you to fetch the user ***with*** an email */
+    Scope["Email"] = "email";
+    /** Allows you to fetch the user ***without*** an email */
+    Scope["Identify"] = "identify";
+    /** Allows you to fetch the user's guilds */
+    Scope["Guilds"] = "guilds";
+    /** Allows your app to add users to a guild */
+    Scope["GuildsJoin"] = "guilds.join";
+})(Scope || (Scope = {}));
+var State;
+(function (State) {
+    /** No auth token stored */
+    State[State["LoggedOut"] = 0] = "LoggedOut";
+    /** Auth token is stored */
+    State[State["LoggedIn"] = 1] = "LoggedIn";
+    /** Authorising */
+    State[State["LoggingIn"] = 2] = "LoggingIn";
+})(State || (State = {}));
+//# sourceMappingURL=lwd.js.map

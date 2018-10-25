@@ -1,59 +1,66 @@
-# LWD
-Simple Promise-based Discord login API<br>
-[Generated Documentation](https://lwd.js.org/docs)<br>
-[Live Example](https://lwd.js.org/)<br>
-[Download](https://github.com/DusterTheFirst/Login-With-Discord/releases)
+# Login With Discord
+### Simple Promise-based Discord login API
 
-## Using
-(HTML)
-```html
-<script src="./lwd.js"></script>
+* [Live Example](https://lwd.js.org/)<br>
+* [Download](https://github.com/DusterTheFirst/Login-With-Discord/releases)
+
+# Installation
+Either download the latest version from the [GitHub releases](https://github.com/DusterTheFirst/Login-With-Discord/releases)
+or to ensure your site always has the latest version, include it using [jsdelivr](https://jsdelivr.net) with the below url
 ```
-(JS)
+https://cdn.jsdelivr.net/gh/dusterthefirst/Login-With-Discord/dist/lwd.js
+```
+
+# Using
+Download [lwd.d.ts](https://cdn.jsdelivr.net/gh/dusterthefirst/Login-With-Discord/dist/lwd.d.ts) if you use typescript or want the extra typings
+
+To start you must create an instance of the class
 ```js
-/// <reference path="./lwd.d.ts" />
 let discord = new LoginWithDiscord({
-    cache: true; //Default TRUE (Reccomended to cache the token)
+    clientID: '<client id>',
+    scopes: [
+        Scope.Identify
+    ]
 });
-
-// Fired when there is an auth token
-discord.onlogin = async () => {
-    // Get the user (requires scope `Identify` or `Email`)
-    let user = await discord.fetchUser().catch(console.log);
-    // Get the user's connections (requires scope `Connections`)
-    let connections = await discord.fetchConnections().catch(console.log);
-    // Get the user's guilds (requires scope `Guilds`)
-    let guilds = await discord.fetchGuilds().catch(console.log);
-    // Add the user to a guild (requires scope `GuildsJoin`)
-    await discord.joinGuild('5h293Fy');
-
-    // The login state
-    discord.state;
-}
-
-// Fires when there is no auth token
-discord.onlogout = async () => {
-    console.log('You have been logged out');
-}
-
-window.onload = async () => {
-    await discord.init(); // Loads auth token, only once the window has loaded
-}
-
-// Authorize
-async function login() {
-    await discord.login(/*ClientID*/, Scope.Identify, Scope.Connections, Scope.Email, Scope.Guilds);
-}
-
-// Unauthorize
-async function logout() {
-    await discord.logout();
-}
 ```
+You must pass it the `clientID` and [scopes](#Supported Scopes) and can optionally pass a `redirect_url`, by default the redirect url is the current one, and you can also disable caching using the `cache` option which is defaulted to true
 
+Once you have the discord object you have access to many functions and event handlers
 
+# Documentaion
 
-## Avaliable scopes
+## `discord.onlogin`
+Event handler called whenever discord.login() completes or the page is loaded with the user already logged in
+
+## `discord.onlogout`
+Event handler called whenever discord.logout() completes or the page is loaded without the user logged in
+
+## `await discord.login()`
+Asynchronous funtion that opens the login dialog for your application
+(Throws an error if the authentication does not complete successfully)
+
+## `discord.logout()`
+Synchronus function that will clear the login cache and log the user out
+
+## `await discord.fetchUser()`
+**(requires scope `Identify` or `Email`)**<br/>
+Asynchronus function that will get the [user object](https://discordapp.com/developers/docs/resources/user#user-object)
+
+## `await discord.fetchConnections()`
+**(requires scope `Connections`)**<br/>
+Asynchronus function that will get the user's [connections](https://discordapp.com/developers/docs/resources/user#connection-object)
+
+## `await discord.fetchGuilds()`
+**(requires scope `Guilds`)**<br/>
+Asynchronus function that will get the user's [guilds](https://discordapp.com/developers/docs/resources/user#get-current-user-guilds)
+
+## `await discord.joinGuild('guildid')`
+Asynchronus function that will join a guild
+
+## `discord.state`
+The current [state](#States) of the login process
+
+## Supported Scopes
 
 | Name              | Scope         | Description                                         |
 | ----------------- | ------------- | --------------------------------------------------- |
@@ -63,7 +70,7 @@ async function logout() {
 | Scope.Guilds      | `guilds`      | Allows you to fetch the user's guilds               |
 | Scope.GuildsJoin  | `guilds.join` | Allows your app to add users to a guild             |
 
-#### `GuildsJoin` requires you to have a bot account linked to your application. Also, in order to add a user to a guild, your bot has to already belong to that guild.
+**`GuildsJoin` requires you to have a bot account linked to your application. Also, in order to add a user to a guild, your bot has to already belong to that guild.**
 
 ## States
 
