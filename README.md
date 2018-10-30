@@ -6,7 +6,7 @@
 
 # Installation
 Either download the latest version from the [GitHub releases](https://github.com/DusterTheFirst/Login-With-Discord/releases)
-or to ensure your site always has the latest version, include it using [jsdelivr](https://jsdelivr.net) with the below url
+or to ensure your site always has the latest version, include it using [jsdelivr](https://www.jsdelivr.com/) with the below url
 ```
 https://cdn.jsdelivr.net/gh/dusterthefirst/Login-With-Discord/dist/lwd.js
 ```
