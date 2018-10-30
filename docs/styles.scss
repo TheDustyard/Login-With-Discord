@@ -8,6 +8,28 @@ html, body {
     overflow: hidden;
 }
 
+.github {
+    position: absolute;
+
+    text-transform: capitalize;
+
+    font-weight: bold;
+
+    bottom: 0;
+    right: 0;
+
+    background: #202225;
+
+    color: #FFFFFF80;
+    text-decoration: none;
+
+    padding: 10px;
+
+    &:hover {
+        color: #FFF;
+    }
+}
+
 #login {
     background-color: #7289DA;
     border: none;
