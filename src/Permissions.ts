@@ -87,11 +87,11 @@ class Permissions {
         if (permission instanceof Array) {
             return permission.every(p => this.has(p, checkAdmin));
         }
-        permission = Permissions.resolve(permission);
+        let resolvedpermission = Permissions.resolve(permission);
         if (checkAdmin && (this.bitfield & Permission.ADMINISTRATOR) > 0) {
             return true;
         }
-        return (this.bitfield & permission) === permission;
+        return (this.bitfield & resolvedpermission) === resolvedpermission;
     }
 
     /**

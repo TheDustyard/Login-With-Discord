@@ -50,11 +50,11 @@ class LoginWithDiscord {
             let parsed = Util.parseHash(window);
             this.setAuth({
                 access_token: parsed.access_token,
+                atime: Date.now(),
                 expires_in: parseInt(parsed.expires_in, 10),
                 scopes: parsed.scope.split("+") as Scope[],
                 state: parsed.state,
                 token_type: parsed.token_type as "Bearer",
-                atime: Date.now()
             });
         }
 
@@ -100,11 +100,11 @@ class LoginWithDiscord {
                     let parsed = Util.parseHash(popout);
                     this.setAuth({
                         access_token: parsed.access_token,
+                        atime: Date.now(),
                         expires_in: parseInt(parsed.expires_in, 10),
                         scopes: parsed.scope.split("+") as Scope[],
                         state: parsed.state,
                         token_type: parsed.token_type as "Bearer",
-                        atime: Date.now()
                     });
                     this.state = State.LoggedIn;
                     resolve();
@@ -142,15 +142,15 @@ class LoginWithDiscord {
             }).then((user) => {
                 resolve({
                     avatar: user.avatar,
-                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
                     avatarGIFURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.gif`,
+                    avatarURL: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`,
                     discriminator: user.discriminator,
                     email: user.email,
                     id: user.id,
+                    mention: `<@${user.id}>`,
                     mfa_enabled: user.mfa_enabled,
-                    username: user.username,
                     tag: `${user.username}#${user.discriminator}`,
-                    mention: `<@${user.id}>`
+                    username: user.username,
                 });
             }).catch(reject);
         });

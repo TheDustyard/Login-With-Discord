@@ -102,18 +102,6 @@ declare class Permissions {
 interface INameToValueMap<T> {
     [key: string]: T;
 }
-declare namespace Util {
-    interface IStringObject {
-        [x: string]: string;
-    }
-    /**
-     * parse GET params from url hash
-     */
-    function parseHash(w?: Window): IStringObject;
-    type Method = "GET" | "POST" | "PUT";
-    function request(method: Method, url: string, headers?: IStringObject): Promise<string>;
-    function requestJSON<T>(method: Method, url: string, headers?: IStringObject): Promise<T>;
-}
 interface IOptions {
     /** Should the user's auth information be cached? (default: true) */
     cache?: boolean;
@@ -193,4 +181,16 @@ declare enum State {
     LoggedIn = 1,
     /** Authorising */
     LoggingIn = 2
+}
+declare namespace Util {
+    interface IStringObject {
+        [x: string]: string;
+    }
+    /**
+     * parse GET params from url hash
+     */
+    function parseHash(w?: Window): IStringObject;
+    type Method = "GET" | "POST" | "PUT";
+    function request(method: Method, url: string, headers?: IStringObject): Promise<string>;
+    function requestJSON<T>(method: Method, url: string, headers?: IStringObject): Promise<T>;
 }

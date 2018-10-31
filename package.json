@@ -1,0 +1,32 @@
+{
+  "name": "login-with-discord",
+  "version": "1.5.0",
+  "description": "Integrate Discord accounts into your website",
+  "private": true,
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DusterTheFirst/Login-With-Discord.git"
+  },
+  "keywords": [
+    "discord",
+    "oauth2",
+    "login",
+    "web"
+  ],
+  "author": "Zachary Kohnen (DusterTheFirst)",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/DusterTheFirst/Login-With-Discord/issues"
+  },
+  "homepage": "https://github.com/DusterTheFirst/Login-With-Discord#readme",
+  "devDependencies": {
+    "@types/node": "^10.12.1",
+    "ts-loader": "^5.3.0",
+    "typescript": "^3.1.4",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.2"
+  }
+}

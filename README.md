@@ -1,17 +1,20 @@
+<img src="https://discordapp.com/assets/f8389ca1a741a115313bede9ac02e2c0.svg" height=100 align="right">
+
 # Login With Discord
+
 ### Simple Promise-based Discord login API
 [![](https://data.jsdelivr.com/v1/package/gh/dusterthefirst/Login-With-Discord/badge)](https://www.jsdelivr.com/package/gh/dusterthefirst/Login-With-Discord)
 ![](https://img.shields.io/github/downloads/DusterTheFirst/Login-With-Discord/total.svg)
 ![](https://img.shields.io/github/size/DusterTheFirst/Login-With-Discord/dist/lwd.js.svg)
-</br>
+<br>
 ![](https://img.shields.io/github/issues/DusterTheFirst/Login-With-Discord.svg)
 ![](https://img.shields.io/github/release/DusterTheFirst/Login-With-Discord.svg)
 ![](https://img.shields.io/github/release-date/DusterTheFirst/Login-With-Discord.svg)
-</br>
+<br>
 ![](https://img.shields.io/github/languages/top/DusterTheFirst/Login-With-Discord.svg)
 ![](https://img.shields.io/github/license/DusterTheFirst/Login-With-Discord.svg)
 
-* [Live Example](https://lwd.js.org/)<br>
+* [Live Example](https://lwd.js.org/)
 * [Download](https://github.com/DusterTheFirst/Login-With-Discord/releases)
 
 # Installation

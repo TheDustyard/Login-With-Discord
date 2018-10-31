@@ -5,13 +5,10 @@
     "tasks": [
         {
             "label": "LWD",
-            "type": "typescript",
-            "tsconfig": "tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
-            "group": "build"
+            "type": "shell",
+            "command": "npx webpack",
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "Demo",
