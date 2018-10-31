@@ -3,7 +3,7 @@
 # Login With Discord
 
 ### Simple Promise-based Discord login API
-[![](https://data.jsdelivr.com/v1/package/gh/dusterthefirst/Login-With-Discord/badge)](https://www.jsdelivr.com/package/gh/dusterthefirst/Login-With-Discord)
+[![](https://data.jsdelivr.com/v1/package/gh/dusterthefirst/Login-With-Discord/badge?style=rounded)](https://www.jsdelivr.com/package/gh/dusterthefirst/Login-With-Discord)
 ![](https://img.shields.io/github/downloads/DusterTheFirst/Login-With-Discord/total.svg)
 ![](https://img.shields.io/github/size/DusterTheFirst/Login-With-Discord/dist/lwd.js.svg)
 <br>
