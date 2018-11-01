@@ -1,0 +1,20 @@
+{
+  "name": "lwd-demo",
+  "version": "1.0.0",
+  "description": "Demo for LWD.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DusterTheFirst/Login-With-Discord.git"
+  },
+  "author": "Zachary Kohnen (DusterTheFirst)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DusterTheFirst/Login-With-Discord/issues"
+  },
+  "homepage": "https://github.com/DusterTheFirst/Login-With-Discord#readme",
+  "devDependencies": {
+    "mini-css-extract-plugin": "^0.4.4",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.2"
+  }
+}

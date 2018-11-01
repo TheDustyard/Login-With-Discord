@@ -16,6 +16,10 @@ module.exports = {
     },
     output: {
         filename: 'lwd.js',
+        library: 'LoginWithDiscord',
+        libraryTarget: 'var',
         path: path.resolve(__dirname, 'dist')
-    }
+    },
+    mode: 'production',
+    watch: true
 };

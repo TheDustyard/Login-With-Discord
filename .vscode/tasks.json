@@ -4,28 +4,18 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "LWD",
+            "label": "LWD - Build",
             "type": "shell",
             "command": "npx webpack",
             "group": "build",
             "problemMatcher": []
         },
         {
-            "label": "Demo",
-            "type": "typescript",
-            "tsconfig": "docs\\tsconfig.json",
-            "option": "watch",
-            "problemMatcher": [
-                "$tsc-watch"
-            ],
-            "group": "build"
-        },
-        {
-            "label": "Demo-Scss",
+            "label": "Demo - Build",
             "type": "shell",
-            "command": "node-sass -w ./docs/ -o ./docs/ --output-style compressed --error-bell",
-            "group": "build",
-            "problemMatcher": []
+            "command": "cd ./docs; npx webpack",
+            "problemMatcher": [],
+            "group": "build"
         }
     ]
 }

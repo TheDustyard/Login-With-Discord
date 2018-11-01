@@ -59,7 +59,7 @@ html, body {
         "guildinspect guilds"
         "connections guilds";
 
-    .user {
+    #user {
         display: block;
 
         grid-area: user;
@@ -74,18 +74,18 @@ html, body {
             height: 128px;
             margin: 20px 20px 20px 20px;
 
-            #userpfp {
+            .userpfp {
                 position: relative;
                 border-radius: 1000px;
                 height: 128px;
             }
 
             .uinfo {
-                margin-left: 20px;
+                margin-left: 30px;
                 display: inline-block;
                 line-height: 20px;
 
-                #usertag {
+                .usertag {
                     display: block;
 
                     .username {
@@ -95,10 +95,6 @@ html, body {
                     .desc {
                         font-size: 15px;
                         opacity: .4;
-
-                        &::before {
-                            content: "#";
-                        }
                     }
                 }
 
@@ -120,8 +116,9 @@ html, body {
                     }
                 }
 
-                #usermfa {
+                .usermfa {
                     display: inline-block;
+                    margin-right: 5px;
 
                     &.enabled {
                         border: none;
@@ -281,6 +278,8 @@ html, body {
             .owner {
                 height: 25px;
                 width: 25px;
+
+                background: transparent;
             }
         }
     }
