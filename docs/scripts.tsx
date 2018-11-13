@@ -30,63 +30,68 @@ discord.onlogin = async () => {
     document.getElementById("login").style.display = "none";
     document.getElementById("loaded").style.display = null;
 
-    // Fetch the user object
-    let user = await discord.fetchUser();
-    // Fetch the users connections
-    let connections = await discord.fetchConnections();
-    // Fetch the users guilds
-    let guilds = await discord.fetchGuilds();
+    try {
+        // Fetch the user object
+        let user = await discord.fetchUser();
+        // Fetch the users connections
+        let connections = await discord.fetchConnections();
+        // Fetch the users guilds
+        let guilds = await discord.fetchGuilds();
 
-    // Display all of the user information
-    document.getElementById("user").innerHTML = "";
-    document.getElementById("user").appendChild(
-        <div className="udata">
-            <object className="userpfp" data={user.avatarGIFURL} type="image/gif">
-                <img src={user.avatarURL} alt="example"/>
-            </object>
-            <div className="uinfo">
-                <div className="usertag">
-                    <span className="username">{user.username}</span>
-                    <span className="desc">#{user.discriminator}</span>
-                </div>
-                <div className="extra">
-                    <span id="userid">{user.id}</span>
-                    <span id="useremail">{user.email}</span>
-                </div>
-                <div className={`usermfa${user.mfa_enabled ? " enabled" : " disabled"}`}>MFA {user.mfa_enabled ? "ENABLED" : "DISABLED"}</div>
-                <button id="logout" onclick={discord.logout}>logout</button>
-            </div>
-        </div>
-    );
-
-    // Display the connections
-    let connect = document.getElementById("connections");
-    // Clear the old connections if any
-    connect.innerHTML = "";
-    for (let connection of connections) {
-        connect.appendChild(
-            <div className="connection">
-                <span className="type">{connection.type}</span>
-                <span className="name">{connection.name}</span>
-                {connection.verified ? <img src="./verified.svg"/> : ""}
-            </div>
-        );
-    }
-
-    // Display the guilds
-    let g = document.getElementById("guilds");
-    // Clear the old guilds if any
-    g.innerHTML = "";
-    for (let guild of guilds) {
-        g.appendChild(
-            <div className="guild">{
-                guild.icon ?
-                    <img src={guild.iconURL} onmouseover={inspectGuildBuilder(guild)}/> :
-                    <div className="img" onmouseover={inspectGuildBuilder(guild)}>
-                        <span>{guild.name.split(" ").map(x => x[0]).join("")}</span>
+        // Display all of the user information
+        document.getElementById("user").innerHTML = "";
+        document.getElementById("user").appendChild(
+            <div className="udata">
+                <object className="userpfp" data={user.avatarGIFURL} type="image/gif">
+                    <img src={user.avatarURL} alt="example"/>
+                </object>
+                <div className="uinfo">
+                    <div className="usertag">
+                        <span className="username">{user.username}</span>
+                        <span className="desc">#{user.discriminator}</span>
                     </div>
-            }</div>
+                    <div className="extra">
+                        <span id="userid">{user.id}</span>
+                        <span id="useremail">{user.email}</span>
+                    </div>
+                    <div className={`usermfa${user.mfa_enabled ? " enabled" : " disabled"}`}>MFA {user.mfa_enabled ? "ENABLED" : "DISABLED"}</div>
+                    <button id="logout" onclick={() => discord.logout()}>logout</button>
+                </div>
+            </div>
         );
+
+        // Display the connections
+        let connect = document.getElementById("connections");
+        // Clear the old connections if any
+        connect.innerHTML = "";
+        for (let connection of connections) {
+            connect.appendChild(
+                <div className="connection">
+                    <span className="type">{connection.type}</span>
+                    <span className="name">{connection.name}</span>
+                    {connection.verified ? <img src="./verified.svg"/> : ""}
+                </div>
+            );
+        }
+
+        // Display the guilds
+        let g = document.getElementById("guilds");
+        // Clear the old guilds if any
+        g.innerHTML = "";
+        for (let guild of guilds) {
+            g.appendChild(
+                <div className="guild">{
+                    guild.icon ?
+                        <img src={guild.iconURL} onmouseover={inspectGuildBuilder(guild)}/> :
+                        <div className="img" onmouseover={inspectGuildBuilder(guild)}>
+                            <span>{guild.name.split(" ").map(x => x[0]).join("")}</span>
+                        </div>
+                }</div>
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        discord.logout();
     }
 };
 
