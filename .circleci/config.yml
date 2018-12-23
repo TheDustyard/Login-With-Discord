@@ -84,7 +84,7 @@ jobs:
 
 workflows:
     version: 2
-    test-lint-compile:
+    lint-compile-pack:
         jobs:
             - install-deps
             - lint:
