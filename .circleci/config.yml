@@ -107,4 +107,4 @@ workflows:
                     - webpack
             - publish:
                 requires:
-                    - hold
+                    - hold-for-publish
