@@ -67,7 +67,7 @@ export enum Permission {
  * * A permission number
  * * An instance of Permissions
  */
-export type PermissionResolvable = string | number | Permission;
+export type PermissionResolvable = keyof typeof Permission | Permission | Permissions | Permission[];
 
 export class Permissions {
     /**
@@ -99,21 +99,21 @@ export class Permissions {
      * Resolves permissions to their numeric form.
      * @param  permission - Permission(s) to resolve
      */
-    public static resolve(permission: unknown | PermissionResolvable): number {
+    public static resolve(permission: PermissionResolvable): number {
         if (typeof permission === "number" && permission >= 0)  {
             return permission;
         }
 
+        if (typeof permission === "string")  {
+            return Permission[permission];
+        }
+
         if (permission instanceof Permissions)  {
-            return (permission as Permissions).bitfield;
+            return permission.bitfield;
         }
 
         if (permission instanceof Array)  {
             return (permission).map((p: Permission) => this.resolve(p)).reduce((prev: Permission, p: Permission) => prev | p, 0);
-        }
-
-        if (typeof permission === "string")  {
-            return ((Permission as unknown) as INameToValueMap<number>)[permission];
         }
 
         throw new RangeError("PERMISSIONS_INVALID");

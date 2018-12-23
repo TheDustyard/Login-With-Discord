@@ -3,6 +3,7 @@
  */
 
 import { EventEmitter } from "events";
+import { Auth, IAuthResponse, IStorageAuth } from "./Auth";
 import { AuthenticationInvalidError, AuthenticationRequiredError, GuildInviteExpiredError, MissingScopesError } from "./Errors";
 import { Guild, IGuild } from "./Guild";
 import { IUser, User } from "./User";
@@ -19,22 +20,7 @@ interface IOptions {
     redirect_url?: string;
 }
 
-interface IAuth {
-    /** User's access token */
-    access_token: string;
-    /** Interval the token is valid for */
-    expires_in: number;
-    /** Scopes of the token */
-    scopes: Scope[];
-    /** State */
-    state: string;
-    /** Token type */
-    token_type: "Bearer";
-    /** Time of auth */
-    atime: number;
-}
-
-enum Scope {
+export enum Scope {
     /** Allows access to linked third-party accounts */
     Connections = "connections",
     /** Allows you to fetch the user ***with*** an email */
@@ -59,7 +45,7 @@ enum State {
 // tslint:disable-next-line:interface-name
 export default interface LoginWithDiscord {
     addListener(event: "login" | "logout", listener: () => void): this;
-    on(event: "login" |"logout", listener: () => void): this;
+    on(event: "login" | "logout", listener: () => void): this;
 
     removeAllListeners(event?: "login" | "logout"): this;
 
@@ -69,35 +55,13 @@ export default interface LoginWithDiscord {
 }
 export default class LoginWithDiscord extends EventEmitter {
     /** Options */
-    private options: IOptions;
+    private readonly options: IOptions;
 
     /** Authorisation */
-    private auth?: IAuth;
+    private auth?: Auth;
 
     /** Login state */
     private state: State = State.LoggedOut;
-
-    // tslint:disable-next-line:no-empty
-    private _onlogin: Function = () => { };
-    // tslint:disable-next-line:no-empty
-    private _onlogout: Function = () => { };
-
-    set onlogin(_: Function) {
-        if (_ instanceof Function) {
-            this._onlogin = _;
-        }
-        else {
-            throw new Error("Event handlers must be callable");
-        }
-    }
-    set onlogout(_: Function) {
-        if (_ instanceof Function) {
-            this._onlogout = _;
-        }
-        else {
-            throw new Error("Event handlers must be callable");
-        }
-    }
 
     /** Create a loginer */
     constructor(options: IOptions) {
@@ -105,8 +69,8 @@ export default class LoginWithDiscord extends EventEmitter {
         this.options = options;
 
         //  SET DEFAULTS
-        this.options.cache = options.cache || true;
-        this.options.redirect_url = options.redirect_url || window.location.href;
+        this.options.cache = options.cache === undefined ? true : options.cache;
+        this.options.redirect_url = options.redirect_url === undefined ? window.location.href : options.redirect_url;
 
         for (let scope of options.scopes) {
             if (!Object.values(Scope).includes(scope)) {
@@ -116,35 +80,29 @@ export default class LoginWithDiscord extends EventEmitter {
 
         this.auth = this.getAuth();
 
-        if (Object.keys(parseHash(window)).includes("access_token")) {
-            let parsed = parseHash(window);
-            this.setAuth({
-                access_token: parsed.access_token,
-                atime: Date.now(),
-                expires_in: parseInt(parsed.expires_in, 10),
-                scopes: parsed.scope.split("+") as Scope[],
-                state: parsed.state,
-                token_type: parsed.token_type as "Bearer",
-            });
+        let parsed = parseHash<IAuthResponse>(window);
+
+        if (Object.keys(parsed).includes("access_token")) {
+            this.setAuth(new Auth(parsed));
         }
 
         window.addEventListener("load", () => this.init());
     }
 
     private init() {
-        if (this.auth && (Date.now() < (this.auth.atime * 10e3) + this.auth.expires_in)) {
-            if (this._onlogin) { this._onlogin(); }
-        } else {
-            if (this._onlogout) { this._onlogout(); }
+        if (this.auth !== undefined && this.auth.expired) {
+            this.emit("logout");
             this.clearAuth();
+        } else {
+            this.emit("login");
         }
     }
 
     /** Login to the Discord API */
     public async login(): Promise<void> {
         // FIXME:
-        if (this.getAuth()) {
-            if (this._onlogin) { this._onlogin(); }
+        if (this.getAuth() !== undefined) {
+            this.emit("login");
             return;
         }
 
@@ -168,23 +126,16 @@ export default class LoginWithDiscord extends EventEmitter {
                 return;
             }
 
-            if (popout.location.hash && location.origin === popout.location.origin) {
+            if (location.origin === popout.location.origin) {
                 clearInterval(waiter);
                 popout.close();
-                let parsed = parseHash(popout);
-                this.setAuth({
-                    access_token: parsed.access_token,
-                    atime: Date.now(),
-                    expires_in: parseInt(parsed.expires_in, 10),
-                    scopes: parsed.scope.split("+") as Scope[],
-                    state: parsed.state,
-                    token_type: parsed.token_type as "Bearer",
-                });
+                let parsed = parseHash<IAuthResponse>(popout);
+                this.setAuth(new Auth(parsed));
                 this.state = State.LoggedIn;
-                if (this._onlogin) { this._onlogin(); }
+                this.emit("login");
                 return;
             }
-            if (popout.location.search && location.origin === popout.location.origin) {
+            if (location.origin === popout.location.origin) {
                 clearInterval(waiter);
                 popout.close();
                 this.state = State.LoggedOut;
@@ -193,14 +144,14 @@ export default class LoginWithDiscord extends EventEmitter {
         }, 100);
     }
     public logout() {
-        if (this._onlogout) { this._onlogout(); }
+        this.emit("logout");
 
         this.clearAuth();
     }
 
     /** Fetch the current user */
     public async fetchUser(): Promise<User> {
-        if (!this.auth) {
+        if (this.auth === undefined) {
             throw new AuthenticationRequiredError();
         }
         if (!(this.auth.scopes.includes(Scope.Identify) || this.auth.scopes.includes(Scope.Email))) {
@@ -208,17 +159,17 @@ export default class LoginWithDiscord extends EventEmitter {
         }
         let response = await fetch(`https://discordapp.com/api/v6/users/@me`, {
             headers: {
-                Authorization: `${this.auth.token_type} ${this.auth.access_token}`
+                Authorization: `${this.auth.tokenType} ${this.auth.accessToken}`
             }
         });
-        let user: IUser = await response.json();
+        let user = await response.json() as IUser;
 
         return new User(user);
     }
 
     /** Fetch the users connections */
     public async fetchConnections(): Promise<IConnection[]> {
-        if (!this.auth) {
+        if (this.auth === undefined) {
             throw new AuthenticationRequiredError();
         }
         if (!(this.auth.scopes.includes(Scope.Connections))) {
@@ -226,7 +177,7 @@ export default class LoginWithDiscord extends EventEmitter {
         }
         let response = await fetch("https://discordapp.com/api/v6/users/@me/connections", {
             headers: {
-                Authorization: `${this.auth.token_type} ${this.auth.access_token}`
+                Authorization: `${this.auth.tokenType} ${this.auth.accessToken}`
             }
         });
         if (!response.ok) {
@@ -237,7 +188,7 @@ export default class LoginWithDiscord extends EventEmitter {
 
     /** Fetch the current users guilds */
     public async fetchGuilds(): Promise<Guild[]> {
-        if (!this.auth) {
+        if (this.auth === undefined) {
             throw new AuthenticationRequiredError();
         }
         if (!(this.auth.scopes.includes(Scope.Guilds))) {
@@ -245,19 +196,19 @@ export default class LoginWithDiscord extends EventEmitter {
         }
         let response = await fetch(`https://discordapp.com/api/v6/users/@me/guilds`, {
             headers: {
-                Authorization: `${this.auth.token_type} ${this.auth.access_token}`
+                Authorization: `${this.auth.tokenType} ${this.auth.accessToken}`
             }
         });
         if (!response.ok) {
             throw new AuthenticationInvalidError();
         }
-        let guilds: IGuild[] = await response.json();
+        let guilds = await response.json() as IGuild[];
         return guilds.map(x => new Guild(x));
     }
 
     /** Join the user into a guild */
     public async joinGuild(inviteID: string): Promise<void> {
-        if (!this.auth) {
+        if (this.auth === undefined) {
             throw new AuthenticationRequiredError();
         }
         if (!(this.auth.scopes.includes(Scope.GuildsJoin))) {
@@ -265,7 +216,7 @@ export default class LoginWithDiscord extends EventEmitter {
         }
         let response = await fetch(`https://discordapp.com/api/v6/invites/${inviteID}`, {
             headers: {
-                Authorization: `${this.auth.token_type} ${this.auth.access_token}`
+                Authorization: `${this.auth.tokenType} ${this.auth.accessToken}`
             },
             method: "POST"
         });
@@ -279,22 +230,23 @@ export default class LoginWithDiscord extends EventEmitter {
         */
     }
 
-    private setAuth(auth: IAuth): void {
+    private setAuth(auth: Auth): void {
         this.auth = auth;
-        if (this.options.cache) {
-            window.localStorage.setItem("LWD", JSON.stringify(auth));
+        if (this.options.cache !== undefined && this.options.cache) {
+            window.localStorage.setItem("LWD", auth.toJSON());
         }
     }
     private clearAuth(): void {
         this.auth = undefined;
-        if (this.options.cache) {
+        if (this.options.cache !== undefined && this.options.cache) {
             window.localStorage.removeItem("LWD");
         }
     }
-    private getAuth(): IAuth | undefined {
-        if (this.options.cache) {
-            if (window.localStorage.getItem("LWD")) {
-                return JSON.parse(window.localStorage.getItem("LWD") || "");
+    private getAuth(): Auth | undefined {
+        if (this.options.cache !== undefined && this.options.cache) {
+            let cache = window.localStorage.getItem("LWD");
+            if (cache !== null) {
+                return new Auth(JSON.parse(cache) as IStorageAuth);
             }
             else {
                 return undefined;

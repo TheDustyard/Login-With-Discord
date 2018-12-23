@@ -25,18 +25,17 @@ export interface IUser {
     premium_type?: number;
 }
 
+// tslint:disable:variable-name
 export class User implements IUser {
     public id: string;
     public username: string;
     public discriminator: string;
     public avatar: string;
-    // tslint:disable-next-line:variable-name
     public mfa_enabled: boolean;
     public locale?: string;
     public verified?: boolean;
     public email?: string;
     public flags: number;
-    // tslint:disable-next-line:variable-name
     public premium_type?: number;
 
     constructor(user: IUser) {

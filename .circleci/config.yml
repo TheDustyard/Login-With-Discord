@@ -106,5 +106,6 @@ workflows:
                     - compile
                     - webpack
             - publish:
+                context: NPM Account
                 requires:
                     - hold-for-publish

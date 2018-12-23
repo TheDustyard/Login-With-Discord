@@ -35,7 +35,7 @@ export class Guild implements IGuild {
     }
 
     public get iconUrl() {
-        if (this.icon) {
+        if (this.icon !== undefined) {
             return `https://cdn.discordapp.com/avatars/${this.id}/${this.icon}.png`;
         }
         return undefined;
