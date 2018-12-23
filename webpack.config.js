@@ -1,25 +1,29 @@
-const path = require('path');
+const path = require("path");
+const webpack = require('webpack');
 
 module.exports = {
-    entry: './src/index.ts',
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/
-            }
-        ]
-    },
-    resolve: {
-        extensions: ['.ts']
+    entry: {
+        "lwd": "./src/lwd.ts"
     },
     output: {
-        filename: 'lwd.js',
-        library: 'LoginWithDiscord',
-        libraryTarget: 'var',
-        path: path.resolve(__dirname, 'dist')
+        filename: "[name].js",
+        library: "LoginWithDiscord",
+        libraryTarget: "commonjs",
+        path: path.resolve(__dirname, "bin")
     },
-    mode: 'production',
-    watch: true
+    module: {
+        rules: [
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/
+          }
+        ]
+      },
+    resolve: {
+        extensions: [".ts"]
+    },
+    mode: "production",
+    devtool: 'inline-source-map',
+    // watch: true
 };

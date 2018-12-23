@@ -188,7 +188,7 @@ export default class LoginWithDiscord extends EventEmitter {
                 clearInterval(waiter);
                 popout.close();
                 this.state = State.LoggedOut;
-                throw "Access Denied: Could not log in user";
+                throw new AuthenticationInvalidError();
             }
         }, 100);
     }

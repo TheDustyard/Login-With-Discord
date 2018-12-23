@@ -7,7 +7,7 @@ interface IConnection {
     id: string;
     name: string;
     show_activity: boolean;
-    type: string; // ENUM?
+    type: string;
     verified: boolean;
     visibility: number;
 }
