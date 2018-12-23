@@ -107,5 +107,5 @@ workflows:
                 filters:
                     tags:
                         only: /v[0-9]+(\.[0-9]+)*/
-                requires:
-                    - hold-for-publish
+                # requires:
+                #     - hold-for-publish
