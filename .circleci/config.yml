@@ -27,7 +27,7 @@ jobs:
                 at: "."
             - run: 
                 name: TypeScript Compile
-                command: npm run compile -s
+                command: npm run compile:ci -s
 
     webpack:
         docker:
