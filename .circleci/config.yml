@@ -1,0 +1,110 @@
+version: 2
+jobs:
+    lint:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+            - attach_workspace:
+                at: "."
+            - run: 
+                name: Make report directory
+                command: mkdir -p reports/junit
+            - run: 
+                name: TSLint
+                command: npm run lint:ci -s
+            - store_test_results:
+                path: reports/junit
+            - store_artifacts:
+                path: reports/junit
+
+    compile:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+            - attach_workspace:
+                at: "."
+            - run: 
+                name: TypeScript Compile
+                command: npm run compile -s
+
+    webpack:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+            - attach_workspace:
+                at: "."
+            - run: 
+                name: Webpack
+                command: npm run build -s
+
+    publish:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+            - attach_workspace:
+                at: "."
+            - run: 
+                name: Login
+                command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            - run: 
+                name: NPM Publish
+                command: npm publish
+
+    install-deps:
+        docker:
+            - image: circleci/node:latest
+        steps:
+            - checkout
+            - restore_cache:
+                key: dependency-cache-{{ checksum "package-lock.json" }}
+            - run:
+                name: Update NPM
+                command: sudo npm i -g npm@latest
+            - run: 
+                name: Install Dependencies
+                command: npm ci
+            - run:
+                name: Audit
+                command: npm audit
+            - save_cache:
+                paths:
+                    - node_modules
+                    - package-lock.json
+                    - ~/.npm
+                key: dependency-cache-{{ checksum "package-lock.json" }}
+            - persist_to_workspace:
+                    root: "."
+                    paths:
+                        - node_modules
+                        - package-lock.json
+
+workflows:
+    version: 2
+    test-lint-compile:
+        jobs:
+            - install-deps
+            - lint:
+                requires:
+                    - install-deps
+            - compile:
+                requires:
+                    - install-deps
+            - webpack:
+                requires:
+                    - compile
+            - hold-for-publish:
+                type: approval
+                filters:
+                    tags:
+                        only: /v[0-9]+(\.[0-9]+)*/
+                requires:
+                    - lint
+                    - compile
+                    - webpack
+            - publish:
+                requires:
+                    - hold

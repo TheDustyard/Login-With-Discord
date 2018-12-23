@@ -34,7 +34,11 @@
         "deprecation": true,
         "encoding": true,
         "eofline": false,
-        "file-header": false,
+        "file-header": [
+            true,
+            "Copyright \\(C\\) \\d{4}  (.*?) \\(.*?\\)",
+            "Copyright (C) 2018  Zachary Kohnen (DusterTheFirst)"
+        ],
         "forin": false,
         "import-blacklist": false,
         "import-spacing": true,

@@ -1,3 +1,4 @@
+// tslint:disable:file-header
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                 ADAPTED FROM                                *
  * https://github.com/hydrabolt/discord.js/blob/master/src/util/Permissions.js *
@@ -10,7 +11,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /** Numeric permission flags. */
-enum Permission {
+export enum Permission {
     /** Create invitations to the guild */
     CREATE_INSTANT_INVITE = 1 << 0,
     KICK_MEMBERS = 1 << 1,
@@ -66,9 +67,9 @@ enum Permission {
  * * A permission number
  * * An instance of Permissions
  */
-type PermissionResolvable = string | number | Permission;
+export type PermissionResolvable = string | number | Permission;
 
-class Permissions {
+export class Permissions {
     /**
      * Bitfield of the packed permissions
      */

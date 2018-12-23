@@ -1,36 +1,45 @@
 {
-  "name": "login-with-discord",
-  "version": "1.5.3",
-  "description": "Integrate Discord accounts into your website",
-  "private": true,
-  "directories": {
-    "doc": "docs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DusterTheFirst/Login-With-Discord.git"
-  },
-  "keywords": [
-    "discord",
-    "oauth2",
-    "login",
-    "web"
-  ],
-  "author": "Zachary Kohnen (DusterTheFirst)",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/DusterTheFirst/Login-With-Discord/issues"
-  },
-  "homepage": "https://github.com/DusterTheFirst/Login-With-Discord#readme",
-  "devDependencies": {
-    "@types/node": "^10.12.1",
-    "css-loader": "^1.0.1",
-    "node-sass": "^4.9.4",
-    "sass-loader": "^7.1.0",
-    "style-loader": "^0.23.1",
-    "ts-loader": "^5.3.0",
-    "typescript": "^3.1.4",
-    "webpack": "^4.23.1",
-    "webpack-cli": "^3.1.2"
-  }
+    "name": "login-with-discord",
+    "version": "2.0.0",
+    "description": "Integrate Discord accounts into your website",
+    "directories": {
+        "example": "docs",
+        "lib": "src",
+        "bin": "dist"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DusterTheFirst/Login-With-Discord.git"
+    },
+    "keywords": [
+        "discord",
+        "oauth2",
+        "login",
+        "web"
+    ],
+    "author": "Zachary Kohnen (DusterTheFirst)",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/DusterTheFirst/Login-With-Discord/issues"
+    },
+    "homepage": "https://github.com/DusterTheFirst/Login-With-Discord#readme",
+    "devDependencies": {
+        "@types/node": "^10.12.18",
+        "css-loader": "^1.0.1",
+        "node-sass": "^4.9.4",
+        "sass-loader": "^7.1.0",
+        "style-loader": "^0.23.1",
+        "ts-loader": "^5.3.0",
+        "tslint": "^5.12.0",
+        "typescript": "^3.2.2",
+        "webpack": "^4.23.1",
+        "webpack-cli": "^3.1.2"
+    },
+    "scripts": {
+        "build": "webpack .",
+        "lint:ci": "npm run lint -- -t junit -o reports/junit/tslint-results.xml",
+        "lint": "tslint --project ./tsconfig.json",
+        "compile": "tsc"
+    },
+    "dependencies": {}
 }
